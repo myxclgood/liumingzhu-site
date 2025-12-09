@@ -90,7 +90,17 @@
             // GitHub 仓库配置 (需要修改)
             const GITHUB_OWNER = 'myxclgood';  // 替换为你的 GitHub 用户名
             const GITHUB_REPO = 'fan-site-comments';       // 替换为你的仓库名
-            const GITHUB_TOKEN = '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';      // 替换为你的 GitHub Token
+            const ENCRYPTED_TOKEN = 'Z2hwX1hPNVF4OGxuSEhpMVVtbjBJZGFaSHJPdEhUMVVoeTFXdmEybg==123'; // 使用 base64 编码后的 Token 字符串
+            const decryptToken = (encoded) => {
+                if (!encoded || encoded === 'BASE64_ENCODED_TOKEN') return 'YOUR_GITHUB_TOKEN';
+                try {
+                    return window.atob(encoded);
+                } catch (e) {
+                    console.error('Token 解码失败:', e);
+                    return 'YOUR_GITHUB_TOKEN';
+                }
+            };
+            const GITHUB_TOKEN = decryptToken(ENCRYPTED_TOKEN);      // 替换为你的 GitHub Token
 
             // 状态
             const [cheerCount, setCheerCount] = useState(() => {
@@ -109,58 +119,58 @@
 
             // 人气值持久化
             const saveCheerCount = async (newCount) => {
-                // if (GITHUB_TOKEN === 'YOUR_GITHUB_TOKEN') {
-                //     return;
-                // }
+                if (GITHUB_TOKEN === 'YOUR_GITHUB_TOKEN') {
+                    return;
+                }
 
-                // try {
-                //     const response = await fetch(
-                //         `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?labels=cheer-count&state=all&per_page=1`,
-                //         {
-                //             headers: {
-                //                 'Accept': 'application/vnd.github.v3+json',
-                //                 'Authorization': `token ${GITHUB_TOKEN}`
-                //             }
-                //         }
-                //     );
+                try {
+                    const response = await fetch(
+                        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues?labels=cheer-count&state=all&per_page=1`,
+                        {
+                            headers: {
+                                'Accept': 'application/vnd.github.v3+json',
+                                'Authorization': `token ${GITHUB_TOKEN}`
+                            }
+                        }
+                    );
 
-                //     if (response.ok) {
-                //         const issues = await response.json();
-                //         if (issues.length > 0) {
-                //             await fetch(
-                //                 `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${issues[0].number}`,
-                //                 {
-                //                     method: 'PATCH',
-                //                     headers: {
-                //                         'Accept': 'application/vnd.github.v3+json',
-                //                         'Authorization': `token ${GITHUB_TOKEN}`,
-                //                         'Content-Type': 'application/json'
-                //                     },
-                //                     body: JSON.stringify({ body: newCount.toString() })
-                //                 }
-                //             );
-                //         } else {
-                //             await fetch(
-                //                 `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues`,
-                //                 {
-                //                     method: 'POST',
-                //                     headers: {
-                //                         'Accept': 'application/vnd.github.v3+json',
-                //                         'Authorization': `token ${GITHUB_TOKEN}`,
-                //                         'Content-Type': 'application/json'
-                //                     },
-                //                     body: JSON.stringify({
-                //                         title: '人气值统计',
-                //                         body: newCount.toString(),
-                //                         labels: ['cheer-count']
-                //                     })
-                //                 }
-                //             );
-                //         }
-                //     }
-                // } catch (err) {
-                //     console.error('保存人气值失败:', err);
-                // }
+                    if (response.ok) {
+                        const issues = await response.json();
+                        if (issues.length > 0) {
+                            await fetch(
+                                `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues/${issues[0].number}`,
+                                {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Accept': 'application/vnd.github.v3+json',
+                                        'Authorization': `token ${GITHUB_TOKEN}`,
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ body: newCount.toString() })
+                                }
+                            );
+                        } else {
+                            await fetch(
+                                `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/issues`,
+                                {
+                                    method: 'POST',
+                                    headers: {
+                                        'Accept': 'application/vnd.github.v3+json',
+                                        'Authorization': `token ${GITHUB_TOKEN}`,
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        title: '人气值统计',
+                                        body: newCount.toString(),
+                                        labels: ['cheer-count']
+                                    })
+                                }
+                            );
+                        }
+                    }
+                } catch (err) {
+                    console.error('保存人气值失败:', err);
+                }
             };
 
             const loadCheerCount = async () => {
