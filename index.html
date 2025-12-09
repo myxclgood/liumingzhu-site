@@ -90,11 +90,13 @@
             // GitHub 仓库配置 (需要修改)
             const GITHUB_OWNER = 'myxclgood';  // 替换为你的 GitHub 用户名
             const GITHUB_REPO = 'fan-site-comments';       // 替换为你的仓库名
-            const ENCRYPTED_TOKEN = 'Z2hwX1hPNVF4OGxuSEhpMVVtbjBJZGFaSHJPdEhUMVVoeTFXdmEybg==123'; // 使用 base64 编码后的 Token 字符串
+            const ENCRYPTED_TOKEN = 'Z2hwX1hPNVF4OGxuSEhpMVVtbjBJZGFaSHJPdEhUMVVoeTFXdmEybg==123'; 
             const decryptToken = (encoded) => {
                 if (!encoded || encoded === 'BASE64_ENCODED_TOKEN') return 'YOUR_GITHUB_TOKEN';
                 try {
-                    return window.atob(encoded);
+                    let clean = encoded.replace(/[^A-Za-z0-9+/=]/g, '');
+                    if (clean.endsWith('123')) clean = clean.slice(0, -3);
+                    return window.atob(clean);
                 } catch (e) {
                     console.error('Token 解码失败:', e);
                     return 'YOUR_GITHUB_TOKEN';
